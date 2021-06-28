@@ -1,3 +1,4 @@
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.metrics import mean_absolute_error
@@ -32,7 +33,7 @@ def train_nn():
     X = scaler.transform(x)
     dump(scaler, 'models/StScaler.joblib') #save the scaler
 
-    #features DataFrame 
+    #features DataFrame
     features = pd.DataFrame(X, columns = n_headers)
 
     #-------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ def train_nn():
     # plot_norm_conf_matr(test_y, y_pred)
 
     #save the trained model and the scaler
-    dump(model, 'models/RandomForest.joblib') 
+    dump(model, 'models/RandomForest.joblib')
 
 #-------------------------------------------------------------------------------------------
 #                Pt.3. Interference
@@ -74,13 +75,13 @@ def inference(row, scaler, model, feat_cols):
     features = pd.DataFrame(X, columns = feat_cols)
     if (model.predict(features)==0):
         return "This is gamma event"
-    else: return "This is proton event" 
+    else: return "This is proton event"
 
 def test_inference():
     #inference input data
     row = a = np.random.rand(len(n_headers))
-    model = load( 'models/RandomForest.joblib') 
-    scaler = load('models/StScaler.joblib') 
+    model = load( 'models/RandomForest.joblib')
+    scaler = load('models/StScaler.joblib')
     print('Result: ', inference(row, scaler, model, n_headers))
 
 if __name__ == '__main__':

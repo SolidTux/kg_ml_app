@@ -3,23 +3,22 @@
 #import the necessary libraries
 import streamlit as st
 import joblib
-import pandas as pd
+#import pandas as pd
 from PIL import Image
-from toy_NN import inference
-import datetime
-from math import sqrt
+from kost_NN import inference
+#import datetime
 
 def my_notes():
     st.markdown(
     '''
     Вопрос: как много гамма-кандидатов?
 
-    Что можно менять: 
+    Что можно менять:
         - дата каты (много)
         - модель машинного обучения (+классич. анализ)
         - модель симуляций?
 
-    Что возвращаем? 
+    Что возвращаем?
         - % гамма кандидатов (на основе каскадовских данных)
         - сколько всего данных, соотв таким катам, находится среди КАСКАДОВСКИХ данных?
         - картинка с балансом гамм и не-гамм
@@ -29,20 +28,20 @@ def my_notes():
     )
 
 # optimized model and scaler load using streamlit cache
-@st.cache(allow_output_mutation=True)
-def load(scaler_path, model_path):
-    sc = joblib.load(scaler_path)
-    model = joblib.load(model_path)
-    return sc , model
+#@st.cache(allow_output_mutation=True)
+#def load(scaler_path, model_path):
+    #sc = joblib.load(scaler_path)
+    #model = joblib.load(model_path)
+    #return sc, model
 
 def tell_me_more():
     st.button('Back to gamma hadron separation')  # will change state and hence trigger rerun and hence reset should_tell_me_more
     st.write('Here will be more text')
-    
+
 def gh_classification():
     #SET UP THE SIDEBAR
-    headers = ['Particle', 'lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age'] 
-    # age =           st.sidebar.number_input("Age in Years", 1, 150, 25, 1)  
+    headers = ['Particle', 'lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
+    # age =           st.sidebar.number_input("Age in Years", 1, 150, 25, 1)
     # glucose =       st.sidebar.slider("Glucose Level", 0, 200, 25, 1)    #feature_name, min, max, default, step
 
    ## Range selector
@@ -51,7 +50,7 @@ def gh_classification():
     # start_date = dt.date(year=2021,month=1,day=1)-relativedelta(years=2)  #  I need some range in the past
     # end_date = dt.datetime.now().date()-relativedelta(years=2)
     # max_days = end_date-start_date
-    
+
     # slider = cols1.slider('Select date', min_value=start_date, value=end_date ,max_value=end_date, format=format)
     # ## Sanity check
     # st.table(pd.DataFrame([[start_date, slider, end_date]],
@@ -78,8 +77,7 @@ def gh_classification():
     ne = st.sidebar.slider('Electron number [log10]', 2.0, 8.7, 4.3, 0.1)
     nmu = st.sidebar.slider('Muon number [log10]', 2.0, 7.7, 3.0, 0.1)
     age = st.sidebar.slider('Shower Age', 0.1, 1.48,0.5, 0.01)
-    
-    core_dist = sqrt(x_core**2 + y_core**2)
+
 # zimuth [°]	0 –  360	azimuth
 # Core distance [m]	0 –  91	core_distance
 # Datetime	1998-05-08 16:35:38 –  2013-01-15 09:40:36	datetime
@@ -89,21 +87,15 @@ def gh_classification():
 # Shower age	0.1 –  1.48	shower_age
 # Zenith [°]	0 –  60	zenith
 
-
-
-
-    row = [energy, x_core, y_core, core_dist, ze, Az, ne, nmu, age]
+    row = [energy, x_core, y_core, ze, Az, ne, nmu, age]
 
     #  RUN THE PIPELINES
     if (st.button('Let\'s go!')):
-        feat_cols = ['lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
-
-        sc, model = load('models/StScaler.joblib', 'models/RandomForest.joblib')
-        result = inference(row, sc, model, feat_cols)
-        
-        #display the output 
-        st.write(result) 
-    
+        #feat_cols = ['lgE', 'X', 'Y', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
+        results = inference(row)
+        #display the output
+        for _model, _particle in results.items():
+            st.write(f'Model {_model}: {_particle}')
 
 #SET UP THE MAIN WINDOW
 st.title('Machine lerning gamma hadron separation for KASCADE experiment')
@@ -114,8 +106,8 @@ st.markdown(
 """
 
 <br><br/>
-KASCADE was a very successful large detector array which recorded data during more than 20 years on site of the KIT-Campus North, Karlsruhe, Germany (formerly Forschungszentrum, Karlsruhe) 
-at 49,1°N, 8,4°E; 110m a.s.l. KASCADE collected within its lifetime more than 1.7 billion events of which some 433.000.000 survived all quality cuts and are made available here for public 
+KASCADE was a very successful large detector array which recorded data during more than 20 years on site of the KIT-Campus North, Karlsruhe, Germany (formerly Forschungszentrum, Karlsruhe)
+at 49,1°N, 8,4°E; 110m a.s.l. KASCADE collected within its lifetime more than 1.7 billion events of which some 433.000.000 survived all quality cuts and are made available here for public
 usage via web portal <a href='https://kcdc.ikp.kit.edu/'>KCDC</a> (KASCADE Cosmic Ray Data Centre).
 
 """
@@ -137,7 +129,7 @@ if should_tell_me_more:
 else:
     st.markdown('---')
     gh_classification()  #(df) = ?
-        
+
 #st.write('Please fill in the details of the person under consideration in the left sidebar and click on the button below!')
 
 
