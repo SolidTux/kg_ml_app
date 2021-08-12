@@ -25,7 +25,7 @@ st.markdown(
 """
 
 <br><br/>
-KASCADE was a very successful large detector array which recorded data during more than 20 years on site of the KIT-Campus North, Karlsruhe, Germany (formerly Forschungszentrum, Karlsruhe)
+KASCADE was a very successful large detector array which recorded data during 17 years on site of the KIT-Campus North, Karlsruhe, Germany (formerly Forschungszentrum, Karlsruhe)
 at 49,1°N, 8,4°E; 110m a.s.l. KASCADE collected within its lifetime more than 1.7 billion events of which some 433.000.000 survived all quality cuts and are made available here for public
 usage via web portal <a href='https://kcdc.ikp.kit.edu/'>KCDC</a> (KASCADE Cosmic Ray Data Centre).
 
@@ -61,7 +61,7 @@ else:
         * **Ze** zenith angle with respect to the vertical [degree]
         * **Az** azimuth angle with respect to north [degree]
         * **lgNe** number of electrons at observation level [𝑙𝑜𝑔10 number]
-        * **lgNm** number of muons at observation level [𝑙𝑜𝑔10 number]
+        * **lgNmu** number of muons at observation level [𝑙𝑜𝑔10 number]
         * **Age** shower shape parameter
     """)
     #считать данные d dataframe
@@ -134,7 +134,6 @@ else:
         # ax2.set_title("Electron-muon distribution")
     else:
         pass
-
     st.pyplot(fig2)
 
 ##################################################################################
