@@ -13,7 +13,7 @@ Dataset is taken from [KASCADE Cosmic Ray Data Centre](https://kcdc.ikp.kit.edu)
 ### Docker
 
 * Biuld the image: `docker build --tag app:1.1 . `
-* Run the app in the container: `docker run --publish 3344:3344 -it app:1.1`
+* Run the app in the container: `docker run --publish 8344:8344 -it app:1.1`
 
 Ready!
 
@@ -25,11 +25,11 @@ If you don't want to run the app in the container, you can virtual environment u
 
 and when run the app manually using 
 
-`streamlit run kg_ml_app.py --server.port 3344` 
+`streamlit run kg_ml_app.py --server.port 8344` 
 
 (or any other port you prefer).
 
-<b>Warning</b>: streamlit doesn't free the port itself! Use `kill -9 $(lsof -t -i:3344)` for this purpose.
+<b>Warning</b>: streamlit doesn't free the port itself! Use `kill -9 $(lsof -t -i:8344)` for this purpose.
 
 ## Acknowledgements
 

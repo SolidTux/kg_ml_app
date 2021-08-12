@@ -1,0 +1,9 @@
+version: '3'
+services:
+  uberlimb-front:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8344:8344"
+    image: ${DOCKER_REGISTRY:-registry.jetbrains.team/p/genart/uberlimb}/kascade-streamlit:${IMAGE_VERSION:-latest}
