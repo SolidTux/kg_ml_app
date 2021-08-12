@@ -6,102 +6,15 @@ import joblib
 import pandas as pd
 import numpy as np 
 from PIL import Image
-from kost_NN import inference
+from kost_NN import stat
 import matplotlib.pyplot as plt
-
-
-class plot_type:
-    def __init__(self,data):
-        self.data = data
-        self.fig=None
-        self.update_layout=None
-
-    def bar(self,x,y,color):
-        self.fig=px.bar(self.data,x=x,y=y,color=color)
-
-    def pie(self,x,y):
-        self.fig = px.pie(self.data,values=x,names=y)
-
-        
-    def set_title(self,title):
-        
-        self.fig.update_layout(
-                title=f"{title}",
-                    yaxis=dict(tickmode="linear"),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(size=18))
-
-    def set_title_x(self,title):
-        
-        self.fig.update_layout(
-                title=f"{title}",
-                    xaxis=dict(tickmode="linear"),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(size=18))
-
-    def set_title_pie(self,title):
-        self.fig.update_layout(title=title,
-                                paper_bgcolor='rgba(0,0,0,0)',
-                                plot_bgcolor='rgba(0,0,0,0)',
-                                font=dict(size=18))
-        
-
-
-    def plot(self):
-        st.write(self.fig)
-
-class slide_bar:
-    value=4
-    def __init__(self,title,x,y):
-        self.title = title
-        self.x=x
-        self.y=y
-        self.slide_bar = None
-        
-
-    def set(self):
-        self.slide_bar = st.slider(self.title,self.x,self.y)
-        slide_bar.value=self.slide_bar
-
-class select_box:
-    value="tyrion"
-    def __init__(self,data):
-        self.data=data
-        self.box=None
-    def place(self,title,key):
-        header(title)
-        self.box = st.selectbox(str(key),self.data)
-        select_box.value=self.box
+import matplotlib.colors as mcolors
 
 def title(text,size,color):
     st.markdown(f'<h1 style="font-weight:bolder;font-size:{size}px;color:{color};text-align:center;">{text}</h1>',unsafe_allow_html=True)
 
 def header(text):
     st.markdown(f"<p style='color:grey;'>{text}</p>",unsafe_allow_html=True)
-
-# def gh_classification():
-
-    # headers = ['Particle', 'lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
-
-    # energy = st.sidebar.slider('Energy [eV (log10)]', 0, 99, 20, 1)        # Energy [eV (log10)]	13 –  19	energy
-    # x_core = st.sidebar.slider('X [m]', 0, 91, 80, 1)
-    # y_core = st.sidebar.slider('Y [m]', 0, 91, 10, 1)
-    # # core_dist = st.sidebar.slider('Core distance mm', 0, 91, 60, 1)      # Core distance [m]	0 –  91	core_distance
-    # ze = st.sidebar.slider('Zenith [°]', 0, 60, 10, 1)                     # Zenith [°]	0 –  60	zenith 
-    # Az = st.sidebar.slider('Azimuth [°]', 0, 360, 60, 1)                   # azimuth [°]	0 –  360	azimuth
-    # ne = st.sidebar.slider('Electron number [log10]', 2.0, 8.7, 4.3, 0.1)  # Electron number [log10]	2 –  8.7	electron_number
-    # nmu = st.sidebar.slider('Muon number [log10]', 2.0, 7.7, 3.0, 0.1)     # Muon number [log10]	2 –  7.7	muon_number
-    # age = st.sidebar.slider('Shower Age', 0.1, 1.48,0.5, 0.01)             # Shower age	0.1 –  1.48	shower_age
-
-    # row = [energy, x_core, y_core, ze, Az, ne, nmu, age]
-
-    # #  RUN THE PIPELINES
-    # if (st.button('Let\'s go!')):
-    #     results = inference(row)
-    #     for _model, _particle in results.items():
-    #         st.write(f'Model {_model}: {_particle}')
 
 #SET UP THE MAIN WINDOW
 st.title('Machine learning particle classification using for KASCADE data')
@@ -141,6 +54,16 @@ else:
     option_1_s = st.selectbox('',[1,2])
 
     title("Dataframe's structure", 24, 'black')
+
+    st.write("""
+        * **lgE** primary particle energy inducing the shower [𝑙𝑜𝑔10 eV]
+        * **X**, **Y** shower core position (x, y) [m]
+        * **Ze** zenith angle with respect to the vertical [degree]
+        * **Az** azimuth angle with respect to north [degree]
+        * **lgNe** number of electrons at observation level [𝑙𝑜𝑔10 number]
+        * **lgNm** number of muons at observation level [𝑙𝑜𝑔10 number]
+        * **Age** shower shape parameter
+    """)
     #считать данные d dataframe
     if option_1_s == 1:
         df = pd.read_csv('./data/dataset1.csv')
@@ -152,6 +75,8 @@ else:
 
 
     title("Dataset parameter distributions", 24, 'black')
+
+    title("1d distributions", 16, 'black')
     header('parameter')
 
     option_2_s = st.selectbox('', ['Energy', 'X_core', 'Y_core', 'Ze', 'Az', 'Ne', 'Nmu', 'Age'])
@@ -166,41 +91,72 @@ else:
         'Nmu': 'lgNmu', 
         'Age': 'Age'
     }
-    # par_names = ['lgE', 'X', 'Y', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
+
+    plot_tit = {
+        'Energy': 'Energy, eV', 
+        'X_core': 'X, m', 
+        'Y_core': 'Y, m', 
+        'Ze': 'Zenith, deg', 
+        'Az': 'Azimuth, deg', 
+        'Ne': 'log Ne', 
+        'Nmu': 'log Nmu', 
+        'Age': 'Shower age'
+    }
+
     col = d[option_2_s ]
-    hist_values = np.histogram(df[col], bins=50, range=(df[col].min(), df[col].max()))[0]
-    st.bar_chart(hist_values)
+    # hist_values = np.histogram(df[col], bins=50, range=(df[col].min(), df[col].max()))[0]
+    # st.bar_chart(hist_values)
+    fig0, ax0 = plt.subplots()
+    ax0.hist(df[col], bins=50)
+    ax0.set_xlabel(plot_tit[option_2_s])
+    st.pyplot(fig0)
+
+##################################################################################
+
+    title("2d distributions", 16, 'black')
+
+    header('parameters')
+
+    option_2_s_2d = st.selectbox('', ['Shower core', 'Electron-muon distribution'])
+    fig2, ax2 = plt.subplots()
+    if option_2_s_2d == "Shower core":
+        ax2.hist2d(df.X, df.Y, bins=100,  cmap=plt.cm.viridis)
+        # ax2.set_title('Shower print')
+        ax2.set_xlabel('X, meters')
+        ax2.set_ylabel('Y, meters')
+    elif option_2_s_2d == 'Electron-muon distribution':
+        xbins = np.arange(df.lgNmu.min(), df.lgNmu.max(), 0.05) # muons
+        ybins = np.arange(df.lgNe.min(), df.lgNe.max(), 0.05) # electrons
+        plt.hist2d(df.lgNmu, df.lgNe, bins=[xbins,ybins], cmap = plt.cm.rainbow, norm=mcolors.LogNorm())
+        cbar = plt.colorbar()
+        ax2.set_xlabel("$\\rm{log}_{10}(N_{\\mu})$")
+        ax2.set_ylabel("$\\rm{log}_{10}(N_{e})}$")
+        # ax2.set_title("Electron-muon distribution")
+    else:
+        pass
+
+    st.pyplot(fig2)
+
+##################################################################################
 
     title("Neural network prediction", 24, 'black')
     header('model')
-    option_3_s = st.selectbox('', ['QGSJet-4-based gamma-hadron classifier', 'QGSJet-4-based  mass composition classifier', 'Epos-LHC-based gamma-hadron classifier',\
-         'Epos-LHC-based mass composition classifier', 'Sibyll-23c-based gamma-hadron classifier', 'Sibyll-23c-based mass composition classifier'])
+    option_3_s = st.selectbox('', ['QGSJet-4-based gamma-hadron classifier', 'QGSJet-4-based hadron mass composition classifier', 'Epos-LHC-based gamma-hadron classifier',\
+         'Epos-LHC-based hadron mass composition classifier', 'Sibyll-23c-based gamma-hadron classifier', 'Sibyll-23c-based hadron mass composition classifier'])
 
-    # pie2 = plot_type(t_data1)
-    # pie2.pie("imp","season")
-    # pie2.set_title_pie(stb2.value)
-    # pie2.plot()
     mod = {
         'QGSJet-4-based gamma-hadron classifier': 'qgs-4_pr_gm', 
-        'QGSJet-4-based  mass composition classifier': 'qgs-4_wo_gm_log', 
+        'QGSJet-4-based hadron mass composition classifier': 'qgs-4_wo_gm_log', 
         'Epos-LHC-based gamma-hadron classifier': 'epos-LHC_pr_gm',
-        'Epos-LHC-based mass composition classifier': 'epos-LHC_wo_gm_log', 
+        'Epos-LHC-based hadron mass composition classifier': 'epos-LHC_wo_gm_log', 
         'Sibyll-23c-based gamma-hadron classifier': 'sibyll-23c_pr_gm', 
-        'Sibyll-23c-based mass composition classifier': 'sibyll-23c_wo_gm_log'
+        'Sibyll-23c-based hadron mass composition classifier': 'sibyll-23c_wo_gm_log'
     }
     model = mod[option_3_s]
 
-    for i in range(10):
-        row = np.array(df.iloc[i])
-        row
-    results = new_inference(row, model)
-    # for _model, _particle in results.items():
-    #     st.write(f'Model {_model}: {_particle}')
-    #     _model
-  
-    # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-    labels = 'Gammas', 'Protons', 'Helium', 'Carbon', 'Silicon', 'Iron'
-    sizes = [15, 30, 45, 10, 0, 15]
+    labels, sizes = stat(model, df)
+
+    header('predicts that the selected dataset contains:')
 
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
@@ -210,7 +166,9 @@ else:
 
     st.pyplot(fig1)
 
-    # gh_classification()  #(df) = ?
+    title("What's next?", 24, 'black')
 
-
+    st.write('To learn how we trained our models, proceed to our publication [New insights from old cosmic rays: A novel analysis of archival KASCADE data](https://arxiv.org/abs/2108.03407).')
+    # st.write('</br>')
+    st.write('Developed by [V. Tokareva](https://www-kseta.ttp.kit.edu/fellows/Victoria.Tokareva/) for [Astroparticle Physics Research Group](https://research.jetbrains.org/groups/astroparticle-physics/)')
 
