@@ -140,8 +140,8 @@ else:
 
     title("Neural network prediction", 24, 'black')
     header('model')
-    option_3_s = st.selectbox('', ['QGSJet-4-based gamma-hadron classifier', 'QGSJet-4-based hadron mass composition classifier', 'Epos-LHC-based gamma-hadron classifier',\
-         'Epos-LHC-based hadron mass composition classifier', 'Sibyll-23c-based gamma-hadron classifier', 'Sibyll-23c-based hadron mass composition classifier'])
+    option_3_s = st.selectbox('', ['QGSJet-4-based hadron mass composition classifier',
+         'Epos-LHC-based hadron mass composition classifier', 'Sibyll-23c-based hadron mass composition classifier'])
 
     mod = {
         'QGSJet-4-based gamma-hadron classifier': 'qgs-4_pr_gm', 
