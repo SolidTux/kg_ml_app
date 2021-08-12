@@ -3,104 +3,110 @@
 #import the necessary libraries
 import streamlit as st
 import joblib
-#import pandas as pd
+import pandas as pd
+import numpy as np 
 from PIL import Image
 from kost_NN import inference
-#import datetime
+import matplotlib.pyplot as plt
 
-def my_notes():
-    st.markdown(
-    '''
-    Вопрос: как много гамма-кандидатов?
 
-    Что можно менять:
-        - дата каты (много)
-        - модель машинного обучения (+классич. анализ)
-        - модель симуляций?
+class plot_type:
+    def __init__(self,data):
+        self.data = data
+        self.fig=None
+        self.update_layout=None
 
-    Что возвращаем?
-        - % гамма кандидатов (на основе каскадовских данных)
-        - сколько всего данных, соотв таким катам, находится среди КАСКАДОВСКИХ данных?
-        - картинка с балансом гамм и не-гамм
-        - картинка, показывающая, какая часть каскадовских данных соответствовала заявленным катам
-        - насколько мы уверены в своей оценке (+ кнопка с объяснением, как эта оценка считается) - возможно, confusion matrix или roc
-    '''
-    )
+    def bar(self,x,y,color):
+        self.fig=px.bar(self.data,x=x,y=y,color=color)
 
-# optimized model and scaler load using streamlit cache
-#@st.cache(allow_output_mutation=True)
-#def load(scaler_path, model_path):
-    #sc = joblib.load(scaler_path)
-    #model = joblib.load(model_path)
-    #return sc, model
+    def pie(self,x,y):
+        self.fig = px.pie(self.data,values=x,names=y)
 
-def tell_me_more():
-    st.button('Back to gamma hadron separation')  # will change state and hence trigger rerun and hence reset should_tell_me_more
-    st.write('Here will be more text')
+        
+    def set_title(self,title):
+        
+        self.fig.update_layout(
+                title=f"{title}",
+                    yaxis=dict(tickmode="linear"),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(size=18))
 
-def gh_classification():
-    #SET UP THE SIDEBAR
-    headers = ['Particle', 'lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
-    # age =           st.sidebar.number_input("Age in Years", 1, 150, 25, 1)
-    # glucose =       st.sidebar.slider("Glucose Level", 0, 200, 25, 1)    #feature_name, min, max, default, step
+    def set_title_x(self,title):
+        
+        self.fig.update_layout(
+                title=f"{title}",
+                    xaxis=dict(tickmode="linear"),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(size=18))
 
-   ## Range selector
-    # cols1,_ = st.beta_columns((1,2)) # To make it narrower
-    # format = 'MMM DD, YYYY'  # format output
-    # start_date = dt.date(year=2021,month=1,day=1)-relativedelta(years=2)  #  I need some range in the past
-    # end_date = dt.datetime.now().date()-relativedelta(years=2)
-    # max_days = end_date-start_date
+    def set_title_pie(self,title):
+        self.fig.update_layout(title=title,
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                font=dict(size=18))
+        
 
-    # slider = cols1.slider('Select date', min_value=start_date, value=end_date ,max_value=end_date, format=format)
-    # ## Sanity check
-    # st.table(pd.DataFrame([[start_date, slider, end_date]],
-    #                 columns=['start',
-    #                         'selected',
-    #                         'end'],
-    #                 index=['date']))
 
-    # today = datetime.date.today()
-    # tomorrow = today + datetime.timedelta(days=1)
-    # start_date = st.date_input('Start date', today)
-    # end_date = st.date_input('End date', tomorrow)
-    # if start_date < end_date:
-    #     st.success('Start date: `%s`\n\nEnd date:`%s`' % (start_date, end_date))
-    # else:
-    #     st.error('Error: End date must fall after start date.')
+    def plot(self):
+        st.write(self.fig)
 
-    energy = st.sidebar.slider('Energy [eV (log10)]', 0, 99, 20, 1)
-    x_core = st.sidebar.slider('X [m]', 0, 91, 80, 1)
-    y_core = st.sidebar.slider('Y [m]', 0, 91, 10, 1)
-    # core_dist = st.sidebar.slider('Core distance mm', 0, 91, 60, 1)
-    ze = st.sidebar.slider('Zenith [°]', 0, 60, 10, 1)
-    Az = st.sidebar.slider('Azimuth [°]', 0, 360, 60, 1)
-    ne = st.sidebar.slider('Electron number [log10]', 2.0, 8.7, 4.3, 0.1)
-    nmu = st.sidebar.slider('Muon number [log10]', 2.0, 7.7, 3.0, 0.1)
-    age = st.sidebar.slider('Shower Age', 0.1, 1.48,0.5, 0.01)
+class slide_bar:
+    value=4
+    def __init__(self,title,x,y):
+        self.title = title
+        self.x=x
+        self.y=y
+        self.slide_bar = None
+        
 
-# zimuth [°]	0 –  360	azimuth
-# Core distance [m]	0 –  91	core_distance
-# Datetime	1998-05-08 16:35:38 –  2013-01-15 09:40:36	datetime
-# Electron number [log10]	2 –  8.7	electron_number
-# Energy [eV (log10)]	13 –  19	energy
-# Muon number [log10]	2 –  7.7	muon_number
-# Shower age	0.1 –  1.48	shower_age
-# Zenith [°]	0 –  60	zenith
+    def set(self):
+        self.slide_bar = st.slider(self.title,self.x,self.y)
+        slide_bar.value=self.slide_bar
 
-    row = [energy, x_core, y_core, ze, Az, ne, nmu, age]
+class select_box:
+    value="tyrion"
+    def __init__(self,data):
+        self.data=data
+        self.box=None
+    def place(self,title,key):
+        header(title)
+        self.box = st.selectbox(str(key),self.data)
+        select_box.value=self.box
 
-    #  RUN THE PIPELINES
-    if (st.button('Let\'s go!')):
-        #feat_cols = ['lgE', 'X', 'Y', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
-        results = inference(row)
-        #display the output
-        for _model, _particle in results.items():
-            st.write(f'Model {_model}: {_particle}')
+def title(text,size,color):
+    st.markdown(f'<h1 style="font-weight:bolder;font-size:{size}px;color:{color};text-align:center;">{text}</h1>',unsafe_allow_html=True)
+
+def header(text):
+    st.markdown(f"<p style='color:grey;'>{text}</p>",unsafe_allow_html=True)
+
+# def gh_classification():
+
+    # headers = ['Particle', 'lgE', 'X', 'Y', 'CoreDist', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
+
+    # energy = st.sidebar.slider('Energy [eV (log10)]', 0, 99, 20, 1)        # Energy [eV (log10)]	13 –  19	energy
+    # x_core = st.sidebar.slider('X [m]', 0, 91, 80, 1)
+    # y_core = st.sidebar.slider('Y [m]', 0, 91, 10, 1)
+    # # core_dist = st.sidebar.slider('Core distance mm', 0, 91, 60, 1)      # Core distance [m]	0 –  91	core_distance
+    # ze = st.sidebar.slider('Zenith [°]', 0, 60, 10, 1)                     # Zenith [°]	0 –  60	zenith 
+    # Az = st.sidebar.slider('Azimuth [°]', 0, 360, 60, 1)                   # azimuth [°]	0 –  360	azimuth
+    # ne = st.sidebar.slider('Electron number [log10]', 2.0, 8.7, 4.3, 0.1)  # Electron number [log10]	2 –  8.7	electron_number
+    # nmu = st.sidebar.slider('Muon number [log10]', 2.0, 7.7, 3.0, 0.1)     # Muon number [log10]	2 –  7.7	muon_number
+    # age = st.sidebar.slider('Shower Age', 0.1, 1.48,0.5, 0.01)             # Shower age	0.1 –  1.48	shower_age
+
+    # row = [energy, x_core, y_core, ze, Az, ne, nmu, age]
+
+    # #  RUN THE PIPELINES
+    # if (st.button('Let\'s go!')):
+    #     results = inference(row)
+    #     for _model, _particle in results.items():
+    #         st.write(f'Model {_model}: {_particle}')
 
 #SET UP THE MAIN WINDOW
-st.title('Machine lerning gamma hadron separation for KASCADE experiment')
+st.title('Machine learning particle classification using for KASCADE data')
 
-st.subheader('by Victoria Tokareva ([@Victoria.Tokareva](mailto:Victoria.Tokareva@kit.edu))')
+# st.subheader('by Victoria Tokareva ([@Victoria.Tokareva](mailto:Victoria.Tokareva@kit.edu))')
 
 st.markdown(
 """
@@ -113,23 +119,98 @@ usage via web portal <a href='https://kcdc.ikp.kit.edu/'>KCDC</a> (KASCADE Cosmi
 """
 , unsafe_allow_html=True)
 image = Image.open('static/kascade_title.png')
-st.image(image, use_column_width=True)
+image.thumbnail((295, 213),Image.ANTIALIAS)
+st.image(image)
 st.markdown(
 """
-Explore the predictions made by different machine learning methods using the filters on the left. Do you agree with the model?
-
-To read more about the methods, click below.
+In this app you can compare predictions made by different machine learning methods on our preselected datasets.
 
 """
 , unsafe_allow_html=True)
-should_tell_me_more = st.button('Tell me more')
+should_tell_me_more = False #st.button('Tell me more')
 if should_tell_me_more:
     tell_me_more()
     st.markdown('---')
 else:
     st.markdown('---')
-    gh_classification()  #(df) = ?
 
-#st.write('Please fill in the details of the person under consideration in the left sidebar and click on the button below!')
+    title("Work with datasets", 30, 'black')
+
+    header('datasets')
+
+    option_1_s = st.selectbox('',[1,2])
+
+    title("Dataframe's structure", 24, 'black')
+    #считать данные d dataframe
+    if option_1_s == 1:
+        df = pd.read_csv('./data/dataset1.csv')
+    elif option_1_s == 2:
+        df = pd.read_csv('./data/dataset2.csv')
+    else:
+        pass
+    st.write(df.head(10))
+
+
+    title("Dataset parameter distributions", 24, 'black')
+    header('parameter')
+
+    option_2_s = st.selectbox('', ['Energy', 'X_core', 'Y_core', 'Ze', 'Az', 'Ne', 'Nmu', 'Age'])
+    col = 'lgE'
+    d = {
+        'Energy': 'lgE', 
+        'X_core': 'X', 
+        'Y_core': 'Y', 
+        'Ze': 'Ze', 
+        'Az': 'Az', 
+        'Ne': 'lgNe', 
+        'Nmu': 'lgNmu', 
+        'Age': 'Age'
+    }
+    # par_names = ['lgE', 'X', 'Y', 'Ze', 'Az', 'lgNe', 'lgNmu', 'Age']
+    col = d[option_2_s ]
+    hist_values = np.histogram(df[col], bins=50, range=(df[col].min(), df[col].max()))[0]
+    st.bar_chart(hist_values)
+
+    title("Neural network prediction", 24, 'black')
+    header('model')
+    option_3_s = st.selectbox('', ['QGSJet-4-based gamma-hadron classifier', 'QGSJet-4-based  mass composition classifier', 'Epos-LHC-based gamma-hadron classifier',\
+         'Epos-LHC-based mass composition classifier', 'Sibyll-23c-based gamma-hadron classifier', 'Sibyll-23c-based mass composition classifier'])
+
+    # pie2 = plot_type(t_data1)
+    # pie2.pie("imp","season")
+    # pie2.set_title_pie(stb2.value)
+    # pie2.plot()
+    mod = {
+        'QGSJet-4-based gamma-hadron classifier': 'qgs-4_pr_gm', 
+        'QGSJet-4-based  mass composition classifier': 'qgs-4_wo_gm_log', 
+        'Epos-LHC-based gamma-hadron classifier': 'epos-LHC_pr_gm',
+        'Epos-LHC-based mass composition classifier': 'epos-LHC_wo_gm_log', 
+        'Sibyll-23c-based gamma-hadron classifier': 'sibyll-23c_pr_gm', 
+        'Sibyll-23c-based mass composition classifier': 'sibyll-23c_wo_gm_log'
+    }
+    model = mod[option_3_s]
+
+    for i in range(10):
+        row = np.array(df.iloc[i])
+        row
+    results = new_inference(row, model)
+    # for _model, _particle in results.items():
+    #     st.write(f'Model {_model}: {_particle}')
+    #     _model
+  
+    # Pie chart, where the slices will be ordered and plotted counter-clockwise:
+    labels = 'Gammas', 'Protons', 'Helium', 'Carbon', 'Silicon', 'Iron'
+    sizes = [15, 30, 45, 10, 0, 15]
+
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+            shadow=True, startangle=80)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    ax1.legend(sizes, [labels])
+
+    st.pyplot(fig1)
+
+    # gh_classification()  #(df) = ?
+
 
 
