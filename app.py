@@ -140,16 +140,16 @@ else:
 
     title("Neural network prediction", 24, 'black')
     header('model')
-    option_3_s = st.selectbox('', ['QGSJet-4-based hadron mass composition classifier',
-         'Epos-LHC-based hadron mass composition classifier', 'Sibyll-23c-based hadron mass composition classifier'])
+    option_3_s = st.selectbox('', ['QGSJet-II.04-based hadron mass composition classifier',
+         'Epos-LHC-based hadron mass composition classifier', 'Sibyll-2.3c-based hadron mass composition classifier'])
 
     mod = {
-        'QGSJet-4-based gamma-hadron classifier': 'qgs-4_pr_gm', 
-        'QGSJet-4-based hadron mass composition classifier': 'qgs-4_wo_gm_log', 
+        'QGSJet-II.04-based gamma-hadron classifier': 'qgs-4_pr_gm', 
+        'QGSJet-II.04-based hadron mass composition classifier': 'qgs-4_wo_gm_log', 
         'Epos-LHC-based gamma-hadron classifier': 'epos-LHC_pr_gm',
         'Epos-LHC-based hadron mass composition classifier': 'epos-LHC_wo_gm_log', 
-        'Sibyll-23c-based gamma-hadron classifier': 'sibyll-23c_pr_gm', 
-        'Sibyll-23c-based hadron mass composition classifier': 'sibyll-23c_wo_gm_log'
+        'Sibyll-2.3c-based gamma-hadron classifier': 'sibyll-23c_pr_gm', 
+        'Sibyll-2.3c-based hadron mass composition classifier': 'sibyll-23c_wo_gm_log'
     }
     model = mod[option_3_s]
 
