@@ -38,4 +38,3 @@ and when run the app manually using
 [Streamlit](https://streamlit.io/), for the open-source library for rapid prototyping.
 
 [Astroparticle Physics Research group](https://research.jetbrains.org/groups/astroparticle-physics/), for fruitful discussions and inspiration. 
-
