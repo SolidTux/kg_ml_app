@@ -17,7 +17,7 @@ def header(text):
     st.markdown(f"<p style='color:grey;'>{text}</p>",unsafe_allow_html=True)
 
 #SET UP THE MAIN WINDOW
-st.title('Machine learning particle classification using for KASCADE data')
+st.title('Machine learning particle classification for KASCADE data')
 
 # st.subheader('by Victoria Tokareva ([@Victoria.Tokareva](mailto:Victoria.Tokareva@kit.edu))')
 
