@@ -7,7 +7,7 @@ name = "pypi"
 numpy = "*"
 pandas = "*"
 pandas-profiling = "*"
-sklearn = "*"
+scikit-learn = "*"
 streamlit = "*"
 
 [dev-packages]
