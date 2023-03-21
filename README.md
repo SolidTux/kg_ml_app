@@ -25,11 +25,9 @@ If you don't want to run the app in the container, you can virtual environment u
 
 and when run the app manually using 
 
-`streamlit run kg_ml_app.py --server.port 8344` 
+`streamlit run app.py --server.port 8344` 
 
 (or any other port you prefer).
-
-<b>Warning</b>: streamlit doesn't free the port itself! Use `kill -9 $(lsof -t -i:8344)` for this purpose.
 
 ## Acknowledgements
 
