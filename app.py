@@ -70,47 +70,9 @@ st.write(df.head(10))
 
 title("Dataset parameter distributions", 24, 'black')
 
-title("1d distributions", 16, 'black')
-header('parameter')
-
-option_2_s = st.selectbox('', ['Energy', 'X_core', 'Y_core', 'Ze', 'Az', 'Ne', 'Nmu', 'Age'])
-col = 'lgE'
-d = {
-    'Energy': 'lgE', 
-    'X_core': 'X', 
-    'Y_core': 'Y', 
-    'Ze': 'Ze', 
-    'Az': 'Az', 
-    'Ne': 'lgNe', 
-    'Nmu': 'lgNmu', 
-    'Age': 'Age'
-}
-
-plot_tit = {
-    'Energy': 'Energy, eV', 
-    'X_core': 'X, m', 
-    'Y_core': 'Y, m', 
-    'Ze': 'Zenith, deg', 
-    'Az': 'Azimuth, deg', 
-    'Ne': 'log Ne', 
-    'Nmu': 'log Nmu', 
-    'Age': 'Shower age'
-}
-
-col = d[option_2_s ]
-fig0, ax0 = plt.subplots()
-ax0.hist(df[col], bins=50)
-ax0.set_xlabel(plot_tit[option_2_s])
-st.pyplot(fig0)
-
 ##################################################################################
-
-title("2d distributions", 16, 'black')
-
-header('parameters')
-
 option_2_s_2d = st.selectbox('', ['Histogram', 'Electron-muon distribution'])
-fig2, ax2 = plt.subplots()
+fig, ax = plt.subplots()
 if option_2_s_2d == "Histogram":
     hist = df.lgE.hist(bins=30, alpha=0.5, color = 'r')
     hist.set_title("E spectrum")
@@ -121,9 +83,9 @@ elif option_2_s_2d == 'Electron-muon distribution':
     ybins = np.arange(df.lgNe.min(), df.lgNe.max(), 0.05) # electrons
     plt.hist2d(df.lgNmu, df.lgNe, bins=[xbins,ybins], cmap = plt.cm.rainbow, norm=mcolors.LogNorm())
     cbar = plt.colorbar()
-    ax2.set_xlabel("$\\rm{log}_{10}(N_{\\mu})$")
-    ax2.set_ylabel("$\\rm{log}_{10}(N_{e})}$")
-st.pyplot(fig2)
+    ax.set_xlabel("$\\rm{log}_{10}(N_{\\mu})$")
+    ax.set_ylabel("$\\rm{log}_{10}(N_{e})}$")
+st.pyplot(fig)
 
 st.write('Developed by [V. Tokareva](https://www-kseta.ttp.kit.edu/fellows/Victoria.Tokareva/) for [Astroparticle Physics Research Group](https://research.jetbrains.org/groups/astroparticle-physics/)')
 
