@@ -109,13 +109,13 @@ title("2d distributions", 16, 'black')
 
 header('parameters')
 
-option_2_s_2d = st.selectbox('', ['Shower core', 'Electron-muon distribution'])
+option_2_s_2d = st.selectbox('', ['Histogram', 'Electron-muon distribution'])
 fig2, ax2 = plt.subplots()
-if option_2_s_2d == "Shower core":
-    ax2.hist2d(df.X, df.Y, bins=100,  cmap=plt.cm.viridis)
-    # ax2.set_title('Shower print')
-    ax2.set_xlabel('X, meters')
-    ax2.set_ylabel('Y, meters')
+if option_2_s_2d == "Histogram":
+    hist = df.lgE.hist(bins=30, alpha=0.5, color = 'r')
+    hist.set_title("E spectrum")
+    hist.set_xlabel("E")
+    hist.set_ylabel("number of events");
 elif option_2_s_2d == 'Electron-muon distribution':
     xbins = np.arange(df.lgNmu.min(), df.lgNmu.max(), 0.05) # muons
     ybins = np.arange(df.lgNe.min(), df.lgNe.max(), 0.05) # electrons
@@ -123,9 +123,6 @@ elif option_2_s_2d == 'Electron-muon distribution':
     cbar = plt.colorbar()
     ax2.set_xlabel("$\\rm{log}_{10}(N_{\\mu})$")
     ax2.set_ylabel("$\\rm{log}_{10}(N_{e})}$")
-    # ax2.set_title("Electron-muon distribution")
-else:
-    pass
 st.pyplot(fig2)
 
 st.write('Developed by [V. Tokareva](https://www-kseta.ttp.kit.edu/fellows/Victoria.Tokareva/) for [Astroparticle Physics Research Group](https://research.jetbrains.org/groups/astroparticle-physics/)')
